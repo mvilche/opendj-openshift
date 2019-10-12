@@ -1,6 +1,4 @@
 #!/bin/sh
-set -e
-
 if [ -z "$TIMEZONE" ]; then
 echo "···································································································"
 echo "VARIABLE TIMEZONE NO SETEADA - INICIANDO CON VALORES POR DEFECTO"
