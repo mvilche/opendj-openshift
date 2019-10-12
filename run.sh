@@ -14,4 +14,5 @@ fi
 
 export JAVA_OPTS="-XX:MaxRAMFraction=1 -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Dfile.encoding=UTF8 -XX:+ExitOnOutOfMemoryError"
 /opt/opendj/setup --no-prompt --cli --propertiesFilePath /opt/opendj/initialConfig/config.properties -O
+rm -rf /opt/opendj/locks/server.lock &> /dev/null
 exec /opt/opendj/bin/start-ds -N

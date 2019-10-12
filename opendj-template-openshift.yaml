@@ -95,7 +95,7 @@
           maxUnavailable: 25%
           timeoutSeconds: 600
           updatePeriodSeconds: 1
-        type: Rolling
+        type: Recreate
       template:
         metadata:
           labels:
@@ -115,22 +115,28 @@
                 - mountPath: /opt/opendj/initialConfig
                   name: opendj
                 - mountPath: opt/opendj/config
+                  subPath: config
                   name: opendj-1
                 - mountPath: /opt/opendj/db
-                  name: opendj-1
-                - mountPath: /opt/opendj/bak
+                  subPath: db                
                   name: opendj-1
                 - mountPath: /opt/opendj/changelogDb
+                  subPath: changelogDb                
                   name: opendj-1
                 - mountPath: /opt/opendj/classes
+                  subPath: classes                
                   name: opendj-1
                 - mountPath: /opt/opendj/import-tmp
+                  subPath: import-tmp                
                   name: opendj-1
                 - mountPath: /opt/opendj/ldif
+                  subPath: ldif                
                   name: opendj-1
                 - mountPath: /opt/opendj/locks
+                  subPath: locks                
                   name: opendj-1
                 - mountPath: /opt/opendj/logs
+                  subPath: logs                
                   name: opendj-1                        
               ports:
                 - containerPort: 1636
