@@ -1,0 +1,209 @@
+    ##comienzo Template
+  apiVersion: v1
+  kind: Template
+  metadata:
+    name: opendj-openshift-mvilche
+    labels:
+      template: opendj-openshift-mvilche
+      autor: "Martin_Fabrizzio_Vilche"
+    annotations:
+      openshift.io/display-name: "opendj-openshift-mvilche"
+      iconClass: "icon-github"
+      description: >-
+        opendj - OPENSHIFT
+        Martin Fabrizzio Vilche.
+        https://github.com/mvilche.
+      openshift.io/provider-display-name: "Martin Fabrizzio Vilche"
+      openshift.io/documentation-url: "https://github.com/mvilche/opendj.git"
+      openshift.io/support-url: "https://github.com/mvilche/opendj.git"
+  message: >-
+    Los servicios iniciarán en un par de minutos...
+    Martin Fabrizzio Vilche        
+
+  objects:
+
+
+##################### opendj
+
+
+  - apiVersion: v1
+    data:
+      config.properties: |-
+        hostname                        =martin.com.uy
+        ldapPort                        =1389
+        generateSelfSignedCertificate   =true
+        enableStartTLS                  =true
+        ldapsPort                       =1636
+        jmxPort                         =1689
+        adminConnectorPort              =4444
+        rootUserDN                      =cn=admin
+        rootUserPassword                =password
+        baseDN                          =dc=martin,dc=com,dc=uy
+    kind: ConfigMap
+    metadata:
+      name: config
+
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app: opendj-ldap
+      name: opendj
+    spec:
+      ports:
+        - name: ldap
+          port: 1389
+          protocol: TCP
+          targetPort: 1389
+        - name: ldaps
+          port: 1636
+          protocol: TCP
+          targetPort: 1636
+        - name: admin-console
+          port: 4444
+          protocol: TCP
+          targetPort: 4444
+      selector:
+        app: opendj-ldap
+        deploymentconfig: opendj
+      sessionAffinity: None
+      type: ClusterIP
+
+
+  - apiVersion: v1
+    kind: DeploymentConfig
+    metadata:
+      labels:
+        app: opendj-ldap
+      name: "opendj"
+    spec:
+      replicas: 1  
+      revisionHistoryLimit: 10
+      selector:
+        app: opendj-ldap
+        deploymentconfig: opendj
+      strategy:
+        activeDeadlineSeconds: 21600
+        resources: {}
+        rollingParams:
+          intervalSeconds: 1
+          maxSurge: 25%
+          maxUnavailable: 25%
+          timeoutSeconds: 600
+          updatePeriodSeconds: 1
+        type: Rolling
+      template:
+        metadata:
+          labels:
+            app: opendj-ldap
+            deploymentconfig: opendj
+        spec:        
+          containers:
+            - env:
+                - name: TIMEZONE
+                  value: America/Montevideo
+              image: "opendj:latest"
+              imagePullPolicy: Always
+              name: opendj      
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              volumeMounts:
+                - mountPath: /opt/opendj/initialConfig
+                  name: opendj
+                - mountPath: opt/opendj/config
+                  name: opendj-1
+                - mountPath: /opt/opendj/db
+                  name: opendj-1
+                - mountPath: /opt/opendj/bak
+                  name: opendj-1
+                - mountPath: /opt/opendj/changelogDb
+                  name: opendj-1
+                - mountPath: /opt/opendj/classes
+                  name: opendj-1
+                - mountPath: /opt/opendj/import-tmp
+                  name: opendj-1
+                - mountPath: /opt/opendj/ldif
+                  name: opendj-1
+                - mountPath: /opt/opendj/locks
+                  name: opendj-1
+                - mountPath: /opt/opendj/logs
+                  name: opendj-1                        
+              ports:
+                - containerPort: 1636
+                  protocol: TCP
+                - containerPort: 1389
+                  protocol: TCP
+                - containerPort: 4444
+                  protocol: TCP                                             
+          dnsPolicy: ClusterFirst
+          restartPolicy: Always
+          schedulerName: default-scheduler
+          terminationGracePeriodSeconds: 30          
+          volumes:
+            - configMap:
+                name: opendj
+              name: opendj
+            - name: opendj-1
+              persistentVolumeClaim:
+                claimName: opendj-data              
+      test: false
+      triggers:
+        - type: ConfigChange
+        - imageChangeParams:
+            automatic: true
+            containerNames:
+              - opendj
+            from:
+              kind: ImageStreamTag
+              name: "opendj:latest"
+          type: ImageChange
+
+
+
+  - apiVersion: v1
+    kind: BuildConfig
+    metadata:
+      labels:
+        app: opendj-ldap
+      name: opendj
+    spec:
+      completionDeadlineSeconds: 1800
+      output:
+        to:
+          kind: ImageStreamTag
+          name: opendj:latest
+      source:
+        contextDir: .
+        git:
+          ref: master
+          uri: 'https://github.com/mvilche/opendj-openshift.git'
+        type: Git
+      strategy:
+        dockerStrategy:
+          dockerfilePath: Dockerfile
+      triggers:
+        - type: "ConfigChange"
+
+
+  - apiVersion: v1
+    kind: ImageStream
+    metadata:
+      labels:
+        app: opendj-ldap
+      name: opendj
+    spec: {}
+
+
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      finalizers:
+      - kubernetes.io/pvc-protection
+      name: opendj-data
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 10Gi
+
