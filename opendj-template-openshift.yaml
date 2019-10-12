@@ -41,7 +41,7 @@
         baseDN                          =${BASE_DN}
     kind: ConfigMap
     metadata:
-      name: config
+      name: opendj
 
   - apiVersion: v1
     kind: Service
