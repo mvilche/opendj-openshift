@@ -19,6 +19,6 @@ chgrp -R 0 /opt /usr/bin/run.sh /etc/localtime /etc/timezone  && \
 chmod -R g=u /opt /usr/bin/run.sh /etc/localtime /etc/timezone
 WORKDIR /opt/opendj
 USER 1001
-EXPOSE 10389 10636 60088 60464 8080 8443
+EXPOSE 1389 1636 1689 4444
 ENTRYPOINT ["/usr/bin/run.sh"]
 
