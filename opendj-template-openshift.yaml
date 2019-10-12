@@ -29,16 +29,16 @@
   - apiVersion: v1
     data:
       config.properties: |-
-        hostname                        =martin.com.uy
+        hostname                        =${HOSTNAME}
         ldapPort                        =1389
         generateSelfSignedCertificate   =true
         enableStartTLS                  =true
         ldapsPort                       =1636
         jmxPort                         =1689
         adminConnectorPort              =4444
-        rootUserDN                      =cn=admin
-        rootUserPassword                =password
-        baseDN                          =dc=martin,dc=com,dc=uy
+        rootUserDN                      =cn=${ADMIN_CN}
+        rootUserPassword                =${PASSWORD_ADMIN}
+        baseDN                          =${BASE_DN}
     kind: ConfigMap
     metadata:
       name: config
@@ -63,6 +63,10 @@
           port: 4444
           protocol: TCP
           targetPort: 4444
+        - name: jmx
+          port: 1689
+          protocol: TCP
+          targetPort: 1689
       selector:
         app: opendj-ldap
         deploymentconfig: opendj
@@ -134,7 +138,9 @@
                 - containerPort: 1389
                   protocol: TCP
                 - containerPort: 4444
-                  protocol: TCP                                             
+                  protocol: TCP
+                - containerPort: 1689
+                  protocol: TCP                                                                   
           dnsPolicy: ClusterFirst
           restartPolicy: Always
           schedulerName: default-scheduler
@@ -206,4 +212,25 @@
       resources:
         requests:
           storage: 10Gi
+
+  parameters:
+    - name: BASE_DN
+      displayName: Nombre base dn
+      value: 'dc=dominio,dc=com,dc=uy'
+      required: true
+    - name: ADMIN_CN
+      displayName: Nombre usuario admin
+      value: 'admin'
+      required: true
+    - name: PASSWORD_ADMIN
+      displayName: Contraseña usuario admin
+      from: '[A-Z0-9]{8}'
+      generate: expression      
+      required: true
+    - name: HOSTNAME
+      displayName: Nombre del hostname
+      value: 'dominio.com.uy'
+      required: true            
+    
+
 
