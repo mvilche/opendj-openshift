@@ -15,5 +15,5 @@ echo $TIMEZONE >> /etc/timezone
 fi
 
 export JAVA_OPTS="-XX:MaxRAMFraction=1 -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Dfile.encoding=UTF8 -XX:+ExitOnOutOfMemoryError"
-/opt/opendj/setup --no-prompt --cli --propertiesFilePath /opt/initialConfig/config.properties -O
+/opt/opendj/setup --no-prompt --cli --propertiesFilePath /opt/opendj/initialConfig/config.properties -O
 exec /opt/opendj/bin/start-ds -N
