@@ -13,7 +13,8 @@ RUN apk add --update --no-cache $JDK_VERSION which wget curl tzdata bash openssl
 WORKDIR /opt
 RUN wget $OPENDJ && unzip open*.zip && rm -rf *.zip
 COPY run.sh /usr/bin/run.sh
-RUN adduser -u 1001 -D -H ldap && usermod -aG 0 ldap && touch /etc/localtime /etc/timezone && \
+RUN mkdir -p /opt/data && \
+echo "/opt/data" > /opt/opendj/instance.loc && adduser -u 1001 -D -H ldap && usermod -aG 0 ldap && touch /etc/localtime /etc/timezone && \
 chown -R 1001 /opt /usr/bin/run.sh /etc/localtime /etc/timezone  && \
 chgrp -R 0 /opt /usr/bin/run.sh /etc/localtime /etc/timezone  && \
 chmod -R g=u /opt /usr/bin/run.sh /etc/localtime /etc/timezone

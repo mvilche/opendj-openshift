@@ -48,91 +48,9 @@
     data:
       config.php: |-
         <?php
-        /** NOTE **
-        ** Make sure that <?php is the FIRST line of this file!
-        ** IE: There should NOT be any blank lines or spaces BEFORE <?php
-        **/
-
-        /**
-        * The phpLDAPadmin config file
-        * See: http://phpldapadmin.sourceforge.net/wiki/index.php/Config.php
-        *
-        * This is where you can customise some of the phpLDAPadmin defaults
-        * that are defined in config_default.php.
-        *
-        * To override a default, use the $config->custom variable to do so.
-        * For example, the default for defining the language in config_default.php
-        *
-        * $this->default->appearance['language'] = array(
-        *  'desc'=>'Language',
-        *  'default'=>'auto');
-        *
-        * to override this, use $config->custom->appearance['language'] = 'en_EN';
-        *
-        * This file is also used to configure your LDAP server connections.
-        *
-        * You must specify at least one LDAP server there. You may add
-        * as many as you like. You can also specify your language, and
-        * many other options.
-        *
-        * NOTE: Commented out values in this file prefixed by //, represent the
-        * defaults that have been defined in config_default.php.
-        * Commented out values prefixed by #, dont reflect their default value, you can
-        * check config_default.php if you want to see what the default is.
-        *
-        * DONT change config_default.php, you changes will be lost by the next release
-        * of PLA. Instead change this file - as it will NOT be replaced by a new
-        * version of phpLDAPadmin.
-        */
-
-        /*********************************************
-        * Useful important configuration overrides  *
-        *********************************************/
-
-        /* If you are asked to put PLA in debug mode, this is how you do it: */
         #  $config->custom->debug['level'] = 255;
         #  $config->custom->debug['syslog'] = true;
         #  $config->custom->debug['file'] = '/tmp/pla_debug.log';
-
-        /* phpLDAPadmin can encrypt the content of sensitive cookies if you set this
-          to a big random string. */
-        // $config->custom->session['blowfish'] = null;
-
-        /* If your auth_type is http, you can override your HTTP Authentication Realm. */
-        // $config->custom->session['http_realm'] = sprintf('%s %s',app_name(),'login');
-
-        /* The language setting. If you set this to 'auto', phpLDAPadmin will attempt
-          to determine your language automatically.
-          If PLA doesnt show (all) strings in your language, then you can do some
-          translation at http://translations.launchpad.net/phpldapadmin and download
-          the translation files, replacing those provided with PLA.
-          (We'll pick up the translations before making the next release too!) */
-        // $config->custom->appearance['language'] = 'auto';
-
-        /* The temporary storage directory where we will put jpegPhoto data
-          This directory must be readable and writable by your web server. */
-        // $config->custom->jpeg['tmpdir'] = '/tmp';     // Example for Unix systems
-        #  $config->custom->jpeg['tmpdir'] = 'c:\\temp'; // Example for Windows systems
-
-        /* Set this to (bool)true if you do NOT want a random salt used when
-          calling crypt().  Instead, use the first two letters of the user's
-          password.  This is insecure but unfortunately needed for some older
-          environments. */
-        #  $config->custom->password['no_random_crypt_salt'] = true;
-
-        /* PHP script timeout control. If php runs longer than this many seconds then
-          PHP will stop with an Maximum Execution time error. Increase this value from
-          the default if queries to your LDAP server are slow. The default is either
-          30 seconds or the setting of max_exection_time if this is null. */
-        // $config->custom->session['timelimit'] = 30;
-
-        /* Our local timezone
-          This is to make sure that when we ask the system for the current time, we
-          get the right local time. If this is not set, all time() calculations will
-          assume UTC if you have not set PHP date.timezone. */
-        // $config->custom->appearance['timezone'] = null;
-        #  $config->custom->appearance['timezone'] = 'Australia/Melbourne';
-
         /*********************************************
         * Commands                                  *
         *********************************************/
@@ -332,17 +250,17 @@
 
         /* A convenient name that will appear in the tree viewer and throughout
           phpLDAPadmin to identify this LDAP server to users. */
-        $servers->setValue('server','name','My LDAP Server');
+        $servers->setValue('server','name','OPENSHIFT');
 
         /* Examples:
           'ldap.example.com',
           'ldaps://ldap.example.com/',
           'ldapi://%2fusr%local%2fvar%2frun%2fldapi'
                   (Unix socket at /usr/local/var/run/ldap) */
-        // $servers->setValue('server','host','127.0.0.1');
+        $servers->setValue('server','host','opendj');
 
         /* The port your LDAP server listens on (no quotes). 389 is standard. */
-        // $servers->setValue('server','port',389);
+        $servers->setValue('server','port',1389);
 
         /* Array of base DNs of your LDAP server. Leave this blank to have phpLDAPadmin
           auto-detect it for you. */
@@ -577,15 +495,15 @@
 
         /*
         $servers->newServer('ldap_pla');
-        $servers->setValue('server','name','LDAP Server');
-        $servers->setValue('server','host','127.0.0.1');
-        $servers->setValue('server','port',389);
-        $servers->setValue('server','base',array(''));
+        $servers->setValue('server','name','OPENSHIFT');
+        $servers->setValue('server','host','opendj');
+        $servers->setValue('server','port',1389);
+        $servers->setValue('server','base',array('dc=dominio,dc=com,dc=uy'));
         $servers->setValue('login','auth_type','cookie');
         $servers->setValue('login','bind_id','');
         $servers->setValue('login','bind_pass','');
         $servers->setValue('server','tls',false);
-
+        
         # SASL auth
         $servers->setValue('login','auth_type','sasl');
         $servers->setValue('sasl','mech','GSSAPI');
@@ -723,30 +641,8 @@
               volumeMounts:
                 - mountPath: /opt/opendj/initialConfig
                   name: opendj
-                - mountPath: opt/opendj/config
-                  subPath: config
-                  name: opendj-1
-                - mountPath: /opt/opendj/db
-                  subPath: db                
-                  name: opendj-1
-                - mountPath: /opt/opendj/changelogDb
-                  subPath: changelogDb                
-                  name: opendj-1
-                - mountPath: /opt/opendj/classes
-                  subPath: classes                
-                  name: opendj-1
-                - mountPath: /opt/opendj/import-tmp
-                  subPath: import-tmp                
-                  name: opendj-1
-                - mountPath: /opt/opendj/ldif
-                  subPath: ldif                
-                  name: opendj-1
-                - mountPath: /opt/opendj/locks
-                  subPath: locks                
-                  name: opendj-1
-                - mountPath: /opt/opendj/logs
-                  subPath: logs                
-                  name: opendj-1                        
+                - mountPath: opt/data
+                  name: opendj-1                
               ports:
                 - containerPort: 1636
                   protocol: TCP
