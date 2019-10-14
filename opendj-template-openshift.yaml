@@ -30,10 +30,10 @@
     data:
       config.properties: |-
         hostname                        =${HOSTNAME}
-        ldapPort                        =389
+        ldapPort                        =1389
         generateSelfSignedCertificate   =true
         enableStartTLS                  =true
-        ldapsPort                       =636
+        ldapsPort                       =1636
         jmxPort                         =1689
         adminConnectorPort              =4444
         httpPort                        =8080
@@ -644,13 +644,13 @@
     spec:
       ports:
         - name: ldap
-          port: 389
+          port: 1389
           protocol: TCP
-          targetPort: 389
+          targetPort: 1389
         - name: ldaps
-          port: 636
+          port: 1636
           protocol: TCP
-          targetPort: 636
+          targetPort: 1636
         - name: admin-console
           port: 4444
           protocol: TCP
